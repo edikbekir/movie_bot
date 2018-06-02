@@ -1,15 +1,16 @@
+require_relative 'config/environment'
 require 'telegram/bot'
-require 'byebug'
 
-token = '338214921:AAFf-fZOh8wUyXf85kjvtfiHJ--z2VedZbw'
+TOKEN = '####MY_TOKEN'
 
-Telegram::Bot::Client.run(token) do |bot|
+Telegram::Bot::Client.run(TOKEN) do |bot|
   bot.listen do |message|
     case message.text
     when '/start'
-      bot.api.send_message(chat_id: message.chat.id, text: "Hi, #{message.from.first_name}")
-    when '/stop'
-      bot.api.send_message(chat_id: message.chat.id, text: "Bye, #{message.from.first_name}")
+      start_question = "Select Year or Genre film"
+      answers =
+      Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: [%w(Genre), %w(Year)], one_time_keyboard: true)
+      bot.api.send_message(chat_id: message.chat.id, text: start_question, reply_markup: answers)
     end
   end
 end
