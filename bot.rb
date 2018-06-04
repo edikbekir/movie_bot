@@ -1,25 +1,28 @@
 require_relative 'config/environment'
-require 'telegram/bot'
-require_relative 'lib/parser.rb'
-require_relative 'models/genre.rb'
-require_relative 'models/film.rb'
+require 'telegram_bot'
 
-TOKEN = '#'
+class Main
+  attr_reader :telegram_bot
+  private     :telegram_bot
 
-Telegram::Bot::Client.run(TOKEN) do |bot|
-  bot.listen do |message|
-    case message.text
-    when '/start'
-      start_question = "Select by year or genre"
-      answers =
-      Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: [%w(Genre), %w(Year)], one_time_keyboard: true)
-      bot.api.send_message(chat_id: message.chat.id, text: start_question, reply_markup: answers)
-    when "Genre"
-        question = "Select genre"
-        arr = []
-        Genre.all.each {|g|  arr << g.genre}
-        genres = Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: arr)
-        bot.api.send_message(chat_id: message.chat.id, text: question, reply_markup: genres, resize_keyboard: true)
+  def initialize(telegram_object)
+    @telegram_object = telegram_object
+  end
+
+  def self.update(telegram_object)
+    telegram_object.get_updates(fail_silently: true) do |m|
+      messages(m, telegram_object)
     end
   end
+
+  def self.messages(message, telegram_object)
+    command = message.get_command_for(telegram_object)
+    commands(command)
+  end
+
+  def self.commands(command)
+    puts "Hi"
+  end
 end
+
+main = Main.update(TelegramBot.new(token: ENV['TOKEN']))
